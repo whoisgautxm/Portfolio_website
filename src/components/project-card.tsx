@@ -64,6 +64,8 @@ export function ProjectCard({
           <Image
             src={image}
             alt={title}
+            width={500}  // Specify the width
+            height={300} // Specify the height
             className="h-40 w-full overflow-hidden object-cover object-top"
           />
         )}
