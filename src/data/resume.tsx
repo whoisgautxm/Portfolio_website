@@ -53,7 +53,46 @@ export const DATA = {
   ],
   projects: [
     {
-      title: "Image-Authentication Model Using Merkle-Tree",
+      title: "Updated prover_main.cc in tachyon🟢",
+      dates: "June 2024",
+      active: true,
+      description:
+        "[Tachyon](https://github.com/kroma-network/tachyon) is a ZK prover written in C++. Tachyon is very fast in proof generation and verification comapred to Rapid-Snark. I had added benchmarking functionality to prover_main.cc . Further Details you can see in this [PR](https://github.com/kroma-network/tachyon/pull/450)",
+      technologies: [
+        "C++"
+      ],
+      links: [
+        {
+          type: "Source",
+          href: "https://github.com/kroma-network/tachyon/pull/450",
+          icon: <Icons.github className="size-3" />,
+        },
+      ],
+      image: "https://i.postimg.cc/kM0w0KW9/G6FKmc9W.jpg",
+      video: "",
+    },
+    {
+      title: "Changing ZK prover of ZK email from Rapid-Snark to Tachyon🟡",
+      href: "https://llm.report",
+      dates: "June 2024",
+      active: true,
+      description:
+      "Currently I am working on this project. I am changing the ZK prover of ZK email from Rapid-Snark to Tachyon. This is the [issue](https://github.com/zkemail/email-wallet/issues/75)",
+      technologies: [
+        "Docker",
+      ],
+      links: [
+        {
+          type: "Source",
+          href: "https://github.com/zkemail/email-wallet/issues/75",
+          icon: <Icons.github className="size-3" />,
+        },
+      ],
+      image: "https://i.postimg.cc/TP1rL3nC/0lG8k32G.jpg",
+      video: "",
+    },
+    {
+      title: "Image-Authentication Model Using Merkle-Tree🟢",
       dates: "June 2024",
       active: true,
       description:
@@ -75,7 +114,7 @@ export const DATA = {
       video: "",
     },
     {
-      title: "Zk-Dapp",
+      title: "Zk-Dapp🟡",
       dates: "June 2024",
       active: true,
       description:
@@ -103,51 +142,8 @@ export const DATA = {
       image: "https://i.postimg.cc/VkJqrQfF/Screenshot-2024-06-21-002333.png",
       video:"",
     },
-    {
-      title: "Blockchain Implementation in Rust",
-      dates: "May 2024",
-      active: true,
-      description:
-        "This project is an implementation of a blockchain in Rust by a article by [LogRocket](https://blog.logrocket.com/how-to-build-a-blockchain-in-rust/). It is a simple blockchain implementation that allows users to send and receive messages to and from the blockchain.",
-      technologies: [
-        "Rust",
-        "libp2p"
-      ],
-      links: [
-        {
-          type: "Source",
-          href: "https://github.com/whoisgautxm/Blockchain-Implementation-in-Rust",
-          icon: <Icons.github className="size-3" />,
-        },
-        {
-          type: "Article",
-          href: "https://blog.logrocket.com/how-to-build-a-blockchain-in-rust/",
-          icon: <Icons.globe className="size-3" />,
-        }
-      ],
-      image: "https://i.postimg.cc/SKjvxt30/blockchain.png",
-      video: "",
-    },
-    {
-      title: "Merkle Tree Implementation in Rust",
-      href: "https://llm.report",
-      dates: "June 2024",
-      active: true,
-      description:
-      "This project is an implementation of a Merkle Tree in Rust. This helps users to traverse the tree and verify the authenticity of the data in logarithmic time. It helps to compare 2 Merkle Tree at variuos node levels.",
-      technologies: [
-        "Rust"
-      ],
-      links: [
-        {
-          type: "Source",
-          href: "https://github.com/whoisgautxm/Merkle_Tree/",
-          icon: <Icons.github className="size-3" />,
-        },
-      ],
-      image: "https://i.postimg.cc/7YMcsz0R/Merkle-Tree.png",
-      video: "",
-    },
+    
+    
     
   ],
 } as const;
