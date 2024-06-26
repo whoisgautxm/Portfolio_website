@@ -57,7 +57,7 @@ export const DATA = {
       dates: "June 2024",
       active: true,
       description:
-        "[Tachyon](https://github.com/kroma-network/tachyon) is a ZK prover written in C++. Tachyon is very fast in proof generation and verification comapred to Rapid-Snark. I had added benchmarking functionality to prover_main.cc . Further Details you can see in this [PR](https://github.com/kroma-network/tachyon/pull/450)",
+        "[Tachyon](https://github.com/kroma-network/tachyon) is a ZK prover written in C++. Tachyon is very fast in proof generation and verification comapred to Rapid-Snark. I had added benchmarking functionality to prover_main.cc . Further Details you can see in this [PR](https://github.com/kroma-network/tachyon/pull/452)",
       technologies: [
         "C++"
       ],
