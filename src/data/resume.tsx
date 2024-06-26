@@ -64,7 +64,7 @@ export const DATA = {
       links: [
         {
           type: "Source",
-          href: "https://github.com/kroma-network/tachyon/pull/450",
+          href: "https://github.com/kroma-network/tachyon/pull/452",
           icon: <Icons.github className="size-3" />,
         },
       ],
