@@ -72,7 +72,7 @@ export const DATA = {
       video: "",
     },
     {
-      title: "Changing ZK prover of ZK email from Rapid-Snark to Tachyon🟡",
+      title: "Changing ZK prover of ZK email from Rapid-Snark to Tachyon🟢",
       href: "https://llm.report",
       dates: "June 2024",
       active: true,
