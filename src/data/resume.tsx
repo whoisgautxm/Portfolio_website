@@ -1,9 +1,10 @@
 import { Icons } from "@/components/icons";
+import { title } from "process";
 
 export const DATA = {
   name: "Gautam Kumar",
   initials: "GK",
-  url: "https://dillion.io",
+  url: "https://whoisgautxm.vercel.app/",
   location: "New Delhi, India",
   locationLink: "https://www.google.com/maps/place/New+Delhi,+Delhi,+India/",
   description:
@@ -14,12 +15,10 @@ export const DATA = {
   skills: [
     "React",
     "Python",
-    "C++",
     "Solidity",
     "Rust",
     "Circom",
     "Halo2"
-
   ],
   contact: {
     email: "whoisgautxm@gmail.com",
@@ -29,12 +28,8 @@ export const DATA = {
         url: "https://github.com/whoisgautxm",
         icon: Icons.github,
       },
-      LinkedIn: {
-        url: "https://www.linkedin.com/in/gautam-kumar-052a52175/",
-        icon: Icons.linkedin,
-      },
       X: {
-        url: "https://x.com/whoisgautxm",
+        url: "https://x.com/0xgautxm",
         icon: Icons.x,
       },
     },
@@ -52,6 +47,27 @@ export const DATA = {
     },
   ],
   projects: [
+    {
+      title: "ZKAttestify🟢",
+      dates: "August 2024",
+      active: true,
+      description:
+        "This project tackles a problem outlined by the EAS team as part of their developer tool track. We created a web application that leverages the RISC Zero VM to generate a Zero Knowledge Proof for attestation data, using the attestation UID. Both the proof generation and verification are handled locally on the user's system",
+      technologies: [
+        "Rust",
+        "RISC0 VM"
+      ],
+      links: [
+        {
+          type: "Source",
+          href: "https://github.com/whoisgautxm/ZkAttestifyLocal",
+          icon: <Icons.github className="size-3" />,
+        },
+      ],
+      image: "https://i.postimg.cc/0NwbyKhz/image.png",
+      video: "",
+    },
+    
     {
       title: "Updated prover_main.cc in tachyon🟢",
       dates: "June 2024",
@@ -84,7 +100,7 @@ export const DATA = {
       links: [
         {
           type: "Source",
-          href: "https://github.com/zkemail/email-wallet/issues/75",
+          href: "https://github.com/zkemail/email-wallet/pull/102",
           icon: <Icons.github className="size-3" />,
         },
       ],
@@ -143,7 +159,26 @@ export const DATA = {
       video:"",
     },
     
-    
-    
   ],
+  hackathons: [
+    {
+      title: "SuperHack 2024",
+      dates: "August 2 – 16, 2024",
+      location: "Virtual",
+      description:
+        "We are making a developer tool that  creates ZKP of the attestations from EAS . We had used the RISC Zero ZKVM for proof generation and verification.",
+      image:
+        "https://postimg.cc/xkZxNSHD",
+      links: [
+        {
+          title:"SuperHack",
+          href : "https://ethglobal.com/showcase/zkattestify-1jxe4"
+        },{
+          title: "Github",
+          icon: <Icons.github className="h-4 w-4" />,
+          href : "https://github.com/whoisgautxm/ZkAttestifyLocal"
+        }
+      ],
+    },]
+  
 } as const;
