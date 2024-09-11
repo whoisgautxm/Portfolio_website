@@ -128,36 +128,7 @@ export const DATA = {
       ],
       image: "https://i.postimg.cc/3NHqCCq1/image-auth.png",
       video: "",
-    },
-    {
-      title: "Zk-Dapp🟡",
-      dates: "June 2024",
-      active: true,
-      description:
-      "Using this Dapp we can Input two numbers between 0 and 5, inclusive. The two numbers must not be equal. We'll generate a ZK proof locally in the browser, and only the proof will be sent to the blockchain so that no one watching the blockchain will know the two numbers.It is based on the research paper 'Writing a Zero Knowledge Dapp' by Yujiang Tham, published in Medium.",
-      technologies: [
-        "Circom",
-        "Solidity",
-        "JavaScript",
-        "Next.js",
-        "Typescript",
-
-      ],
-      links: [
-        {
-          type: "Article",
-          href: "https://medium.com/@yujiangtham/writing-a-zero-knowledge-dapp-fd7f936e2d43",
-          icon: <Icons.globe className="size-3" />,
-        },
-        {
-          type: "Source",
-          href: "https://github.com/whoisgautxm/ZK-Dapp",
-          icon: <Icons.github className="size-3" />,
-        }
-      ],
-      image: "https://i.postimg.cc/VkJqrQfF/Screenshot-2024-06-21-002333.png",
-      video:"",
-    },
+    }
     
   ],
   hackathons: [
@@ -171,8 +142,9 @@ export const DATA = {
         "https://postimg.cc/xkZxNSHD",
       links: [
         {
-          title:"SuperHack",
-          href : "https://ethglobal.com/showcase/zkattestify-1jxe4"
+          title: "SuperHack",
+        icon: <Icons.globe className="h-4 w-4" />, // Add a globe or any other appropriate icon
+        href: "https://ethglobal.com/showcase/zkattestify-1jxe4",
         },{
           title: "Github",
           icon: <Icons.github className="h-4 w-4" />,
