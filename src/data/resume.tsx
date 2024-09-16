@@ -10,7 +10,7 @@ export const DATA = {
   description:
     "I am passionate about building softwares that solves problem without telling the solution. I am gaining experience in contributing to ZKP. I am currently looking for internships in ZK engineer .",
   summary:
-  "I am a 3rd year undergraduate student at IIT Delhi, and it's not a Computer Science Degree. It's best of both worlds 'BioTech Enginerring'😊. Figuring out how to contribute to Open Source projects related to ZK-Vms,Zk-Email,Zk-p2p.",
+  "I am a 3rd year undergraduate student at IIT Delhi. Figuring out how to contribute to Open Source projects related to ZK-VMs,Zk-Email,Zk-p2p.",
   avatarUrl: "/me.jpg",
   skills: [
     "React",
