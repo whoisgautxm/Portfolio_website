@@ -151,6 +151,69 @@ export const DATA = {
           href : "https://github.com/whoisgautxm/ZkAttestifyLocal"
         }
       ],
+    },
+    {
+      title: "NeoXGrind 2024",
+      dates: "August 2 – 16, 2024",
+      location: "Offline",
+      description:
+        "This sophisticated decentralized application (dApp) represents a cutting-edge platform for the creation, trading, and management of meme-inspired cryptocurrency tokens.",
+      image:
+        "https://postimg.cc/xkZxNSHD",
+      links: [{
+          title: "Github",
+          icon: <Icons.github className="h-4 w-4" />,
+          href : "https://github.com/whoisgautxm/neox-pump"
+        }
+      ],
+    },
+    {
+      title: "Aligned Builders Hackathon",
+      dates: "October 25 – 29, 2024",
+      location: "Virtual",
+      description:
+        "A Decentralized Fiat-to-Crypto Escrow System Powered by Aligned Layer",
+      image:
+        "https://postimg.cc/xkZxNSHD",
+      links: [{
+        title: "Aligned Builders Hackathon",
+      icon: <Icons.globe className="h-4 w-4" />, // Add a globe or any other appropriate icon
+      href: "https://x.com/alignedlayer/status/1862163895542263824",
+      },{
+          title: "Github",
+          icon: <Icons.github className="h-4 w-4" />,
+          href : "https://github.com/Shivannsh/ZkSetu"
+        }
+      ],
+    }, {
+      title: "Polkadot Hacker House",
+      dates: "November 26 – December 3, 2024",
+      location: "Offline",
+      description:
+        "A PvP betting Dapp on Moonbeam using Chainlink Price feeds ",
+      image:
+        "https://postimg.cc/xkZxNSHD",
+      links: [{
+          title: "Github",
+          icon: <Icons.github className="h-4 w-4" />,
+          href : "https://github.com/whoisgautxm/PvP-Betting-Frontend"
+        }
+      ],
+    },
+    {
+      title: "zkVerify ZK App and Infra Builders",
+      dates: "November 20 – December 10, 2024",
+      location: "Virtual",
+      description:
+        "The AttestVerify uses cryptographic standards and zero-knowledge proofs (ZKP) to ensure secure and verifiable claims while maintaining user privacy.",
+      image:
+        "https://postimg.cc/xkZxNSHD",
+      links: [{
+          title: "Github",
+          icon: <Icons.github className="h-4 w-4" />,
+          href : "https://github.com/whoisgautxm/AttestVerify"
+        }
+      ],
     },]
   
 } as const;
