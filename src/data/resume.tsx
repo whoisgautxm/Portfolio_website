@@ -10,16 +10,9 @@ export const DATA = {
   description:
     "I am passionate about building softwares that solves problem without telling the solution. I am gaining experience in contributing to ZKP. I am currently looking for internships in ZK engineer .",
   summary:
-  "I am a 3rd year undergraduate student at IIT Delhi. Figuring out how to contribute to Open Source projects related to ZK-VMs,Zk-Email,Zk-p2p.",
+    "I am a 3rd year undergraduate student at IIT Delhi. Figuring out how to contribute to Open Source projects related to ZK-VMs,Zk-Email,Zk-p2p.",
   avatarUrl: "/me.jpg",
-  skills: [
-    "React",
-    "Python",
-    "Solidity",
-    "Rust",
-    "Circom",
-    "Halo2"
-  ],
+  skills: ["React", "Python", "Solidity", "Rust", "Circom", "Halo2"],
   contact: {
     email: "whoisgautxm@gmail.com",
     tel: "+91 7906104503",
@@ -34,7 +27,6 @@ export const DATA = {
       },
     },
   },
-
 
   education: [
     {
@@ -53,10 +45,7 @@ export const DATA = {
       active: true,
       description:
         "This project tackles a problem outlined by the EAS team as part of their developer tool track. We created a web application that leverages the RISC Zero VM to generate a Zero Knowledge Proof for attestation data, using the attestation UID. Both the proof generation and verification are handled locally on the user's system",
-      technologies: [
-        "Rust",
-        "RISC0 VM"
-      ],
+      technologies: ["Rust", "RISC0 VM"],
       links: [
         {
           type: "Source",
@@ -67,16 +56,14 @@ export const DATA = {
       image: "https://i.postimg.cc/0NwbyKhz/image.png",
       video: "",
     },
-    
+
     {
       title: "Updated prover_main.cc in tachyon🟢",
       dates: "June 2024",
       active: true,
       description:
         "[Tachyon](https://github.com/kroma-network/tachyon) is a ZK prover written in C++. Tachyon is very fast in proof generation and verification comapred to Rapid-Snark. I had added benchmarking functionality to prover_main.cc . Further Details you can see in this [PR](https://github.com/kroma-network/tachyon/pull/452)",
-      technologies: [
-        "C++"
-      ],
+      technologies: ["C++"],
       links: [
         {
           type: "Source",
@@ -93,10 +80,8 @@ export const DATA = {
       dates: "June 2024",
       active: true,
       description:
-      "Currently I am working on this project. I am changing the ZK prover of ZK email from Rapid-Snark to Tachyon. This is the [issue](https://github.com/zkemail/email-wallet/issues/75)",
-      technologies: [
-        "Docker",
-      ],
+        "Currently I am working on this project. I am changing the ZK prover of ZK email from Rapid-Snark to Tachyon. This is the [issue](https://github.com/zkemail/email-wallet/issues/75)",
+      technologies: ["Docker"],
       links: [
         {
           type: "Source",
@@ -113,12 +98,7 @@ export const DATA = {
       active: true,
       description:
         "This project is an implementation of an image authentication scheme using blockchain and Merkle tree mechanisms, developed in Rust. It is based on the [research paper](https://www.mdpi.com/1999-5903/11/7/149) 'An Image Authentication Scheme Using Merkle Tree Mechanisms' by Gaurav Malav and A. K. Sarje, published in Future Internet.",
-      technologies: [
-        "Rust",
-        "IPFS",
-        "Merkle Trees",
-        "Blockchain"
-      ],
+      technologies: ["Rust", "IPFS", "Merkle Trees", "Blockchain"],
       links: [
         {
           type: "Source",
@@ -128,8 +108,7 @@ export const DATA = {
       ],
       image: "https://i.postimg.cc/3NHqCCq1/image-auth.png",
       video: "",
-    }
-    
+    },
   ],
   hackathons: [
     {
@@ -138,18 +117,18 @@ export const DATA = {
       location: "Virtual",
       description:
         "We are making a developer tool that  creates ZKP of the attestations from EAS . We had used the RISC Zero ZKVM for proof generation and verification.",
-      image:
-        "https://postimg.cc/xkZxNSHD",
+      image: "https://postimg.cc/xkZxNSHD",
       links: [
         {
           title: "SuperHack",
-        icon: <Icons.globe className="h-4 w-4" />, // Add a globe or any other appropriate icon
-        href: "https://ethglobal.com/showcase/zkattestify-1jxe4",
-        },{
+          icon: <Icons.globe className="h-4 w-4" />, // Add a globe or any other appropriate icon
+          href: "https://ethglobal.com/showcase/zkattestify-1jxe4",
+        },
+        {
           title: "Github",
           icon: <Icons.github className="h-4 w-4" />,
-          href : "https://github.com/whoisgautxm/ZkAttestifyLocal"
-        }
+          href: "https://github.com/whoisgautxm/ZkAttestifyLocal",
+        },
       ],
     },
     {
@@ -158,13 +137,13 @@ export const DATA = {
       location: "Offline",
       description:
         "This sophisticated decentralized application (dApp) represents a cutting-edge platform for the creation, trading, and management of meme-inspired cryptocurrency tokens.",
-      image:
-        "https://postimg.cc/xkZxNSHD",
-      links: [{
+      image: "https://postimg.cc/xkZxNSHD",
+      links: [
+        {
           title: "Github",
           icon: <Icons.github className="h-4 w-4" />,
-          href : "https://github.com/whoisgautxm/neox-pump"
-        }
+          href: "https://github.com/whoisgautxm/neox-pump",
+        },
       ],
     },
     {
@@ -173,31 +152,33 @@ export const DATA = {
       location: "Virtual",
       description:
         "A Decentralized Fiat-to-Crypto Escrow System Powered by Aligned Layer",
-      image:
-        "https://postimg.cc/xkZxNSHD",
-      links: [{
-        title: "Aligned Builders Hackathon",
-      icon: <Icons.globe className="h-4 w-4" />, // Add a globe or any other appropriate icon
-      href: "https://x.com/alignedlayer/status/1862163895542263824",
-      },{
+      image: "https://postimg.cc/xkZxNSHD",
+      links: [
+        {
+          title: "Aligned Builders Hackathon",
+          icon: <Icons.globe className="h-4 w-4" />, // Add a globe or any other appropriate icon
+          href: "https://x.com/alignedlayer/status/1862163895542263824",
+        },
+        {
           title: "Github",
           icon: <Icons.github className="h-4 w-4" />,
-          href : "https://github.com/Shivannsh/ZkSetu"
-        }
+          href: "https://github.com/Shivannsh/ZkSetu",
+        },
       ],
-    }, {
+    },
+    {
       title: "Polkadot Hacker House",
       dates: "November 26 – December 3, 2024",
       location: "Offline",
       description:
         "A PvP betting Dapp on Moonbeam using Chainlink Price feeds ",
-      image:
-        "https://postimg.cc/xkZxNSHD",
-      links: [{
+      image: "https://postimg.cc/xkZxNSHD",
+      links: [
+        {
           title: "Github",
           icon: <Icons.github className="h-4 w-4" />,
-          href : "https://github.com/whoisgautxm/PvP-Betting-Frontend"
-        }
+          href: "https://github.com/whoisgautxm/PvP-Betting-Frontend",
+        },
       ],
     },
     {
@@ -205,15 +186,50 @@ export const DATA = {
       dates: "November 20 – December 10, 2024",
       location: "Virtual",
       description:
-        "The AttestVerify uses cryptographic standards and zero-knowledge proofs (ZKP) to ensure secure and verifiable claims while maintaining user privacy.",
-      image:
-        "https://postimg.cc/xkZxNSHD",
-      links: [{
+        "This project implements a system that allows users to obtain private attestations from reputable sources about their personal information, such as age without private information about themeselves.",
+      image: "https://postimg.cc/xkZxNSHD",
+      links: [
+        {
           title: "Github",
           icon: <Icons.github className="h-4 w-4" />,
-          href : "https://github.com/whoisgautxm/AttestVerify"
-        }
+          href: "https://github.com/whoisgautxm/AttestVerify",
+        },
+        {
+          title: "Devfolio",
+          icon: <Icons.globe className="h-4 w-4" />,
+          href: "https://devfolio.co/projects/attestverify-16f9",
+        },
+        {
+          title: "Video",
+          icon: <Icons.youtube className="h-4 w-4" />,
+          href: "https://youtu.be/6f-EMcdC62Q",
+        },
       ],
-    },]
-  
+    },
+    {
+      title: "ZK Online Hackathon for Web3 Builders",
+      dates: "January 27 – February 14, 2025",
+      location: "Virtual",
+      description:
+        "ML model marketplace that provide predictions but maintains the privacy of ML model datasets.",
+      image: "https://postimg.cc/xkZxNSHD",
+      links: [
+        {
+          title: "Github",
+          icon: <Icons.github className="h-4 w-4" />,
+          href: "https://github.com/whoisgautxm/ShadowML",
+        },
+        {
+          title: "Devfolio",
+          icon: <Icons.globe className="h-4 w-4" />,
+          href: "https://devfolio.co/projects/shadowml-e8e2",
+        },
+        {
+          title: "Video",
+          icon: <Icons.youtube className="h-4 w-4" />,
+          href: "https://www.youtube.com/watch?v=AfbtoJ8n_EQ",
+        },
+      ],
+    },
+  ],
 } as const;
