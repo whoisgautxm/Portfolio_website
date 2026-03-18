@@ -40,6 +40,40 @@ export const DATA = {
   ],
   projects: [
     {
+      title: "Stratos🟡",
+      dates: "2025 - Present",
+      active: true,
+      description:
+        "Contributing to **Stratos**, a verifiable central limit order book exchange that combines a high-performance Rust matching engine, zero-knowledge proof generation, and on-chain settlement on Base Sepolia. My work spans the trading frontend, execution engine, and smart-contract layer for a ZK-proven exchange stack.",
+      technologies: [
+        "Rust",
+        "Solidity",
+        "TypeScript",
+        "React",
+        "SP1",
+        "STARKs",
+      ],
+      links: [
+        {
+          type: "Frontend",
+          href: "https://github.com/stratos-labs/stratos-web",
+          icon: <Icons.github className="size-3" />,
+        },
+        {
+          type: "Engine",
+          href: "https://github.com/stratos-labs/stratos-engine",
+          icon: <Icons.github className="size-3" />,
+        },
+        {
+          type: "Contracts",
+          href: "https://github.com/stratos-labs/stratos-smart-contracts",
+          icon: <Icons.github className="size-3" />,
+        },
+      ],
+      image: "",
+      video: "",
+    },
+    {
       title: "ZKAttestify🟢",
       dates: "August 2024",
       active: true,

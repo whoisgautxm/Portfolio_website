@@ -1,0 +1,674 @@
+---
+title: "Inside Stratos: Building a Verifiable CLOB with Rust, STARKs, SP1, and Horizen"
+publishedAt: "2026-03-18"
+summary: "A technical deep dive into Stratos: matching engine design, circuit architecture, STARK-to-SNARK proving, settlement flow, and the security fixes behind a verifiable order book exchange."
+---
+
+This note is based on the `STRATOS_TECHNICAL_PAPER`, but I am writing it in the style of a technical HackMD post: less marketing, more system design.
+
+The goal is to explain how Stratos works as an engineering system:
+
+- what exactly is being built,
+- why the architecture is split across multiple layers,
+- how matching correctness is proven,
+- how settlement is enforced on-chain,
+- where the real complexity shows up.
+
+---
+
+## TL;DR
+
+Stratos is a **verifiable central limit order book (CLOB)**.
+
+It tries to combine:
+
+- off-chain exchange performance,
+- on-chain settlement guarantees,
+- cryptographic proof of matching correctness.
+
+The core stack is:
+
+- `stratos-engine`: Rust matching engine and sequencer,
+- `stratos-prover`: STARK prover for batch correctness,
+- `onchain-verifier` / SP1 wrapper: STARK verification inside SP1, exported as a Groth16 proof,
+- `stratos-smart-contracts`: settlement contracts on Horizen Testnet,
+- Celestia: data availability for compressed batch data,
+- `stratos-web`: frontend for trading and proofs.
+
+The main idea is simple:
+
+1. match orders off-chain,
+2. compute state transition + settlement outputs,
+3. prove the batch was valid,
+4. verify that proof on-chain,
+5. let contracts enforce the resulting balances.
+
+---
+
+## Why This Exists
+
+A real order-book exchange has requirements that are hard to satisfy simultaneously:
+
+- low latency,
+- price-time priority,
+- efficient cancels and updates,
+- trustless custody,
+- verifiable correctness,
+- practical on-chain cost.
+
+If you run the whole thing on-chain, matching becomes expensive and slow.
+
+If you run the whole thing off-chain, users have to trust the operator.
+
+Stratos sits in the middle:
+
+- execution is off-chain for performance,
+- correctness is proven,
+- funds are controlled by contracts,
+- settlement is tied to the proof output.
+
+So this is not "an exchange with some ZK." The ZK system is the mechanism that turns an off-chain matching engine into something users can verify.
+
+---
+
+## High-Level Architecture
+
+I find it easiest to think about Stratos as four layers.
+
+### 1. Client Layer
+
+This is the frontend and wallet/auth layer.
+
+Responsibilities:
+
+- user registration,
+- wallet connection,
+- deposits,
+- order entry,
+- portfolio/proof views,
+- API + websocket interaction with the engine.
+
+This layer is operationally important, but not the root of trust.
+
+### 2. Execution Layer
+
+This is `stratos-engine`.
+
+Responsibilities:
+
+- maintain the order book,
+- process commands,
+- match aggressive orders,
+- maintain resting liquidity,
+- generate trade and settlement outputs,
+- accumulate batches/epochs,
+- prepare prover-facing data.
+
+This is where latency matters the most.
+
+### 3. Proof Layer
+
+This is the STARK system plus the SP1 wrapper.
+
+Responsibilities:
+
+- convert batch execution into circuit trace data,
+- prove that the state transition is valid,
+- bind proof to public inputs,
+- compress the verification path into an EVM-friendly Groth16 proof.
+
+This layer is the core trust bridge between fast off-chain logic and on-chain settlement.
+
+### 4. Settlement Layer
+
+This is the Solidity side on Horizen Testnet.
+
+Responsibilities:
+
+- verify the wrapped proof,
+- store batch state,
+- advance the canonical state root,
+- apply per-user settlement deltas,
+- custody deposit/withdraw balances,
+- provide emergency exit.
+
+This layer is the source of truth for assets.
+
+---
+
+## Matching Engine Design
+
+The matching engine is implemented in Rust and is built around a classic low-latency order book structure.
+
+From the paper and repo structure, the core design includes:
+
+- price-time priority,
+- FIFO behavior at each price level,
+- support for limit, market, IOC, and FOK orders,
+- order placement, cancellation, updates, and matching,
+- snapshots and recent trade data,
+- per-order indexing for fast lookups.
+
+The implementation uses structures like:
+
+- `BTreeMap` for ordered price access,
+- `HashMap` for direct order indexing,
+- queue-like behavior inside price levels.
+
+That is a sensible design because a CLOB needs two different properties at the same time:
+
+- efficient access to the best price,
+- efficient access to specific orders for cancel/update.
+
+The interesting point is that Stratos is not only executing this logic. It later has to **prove** that the logic was followed correctly.
+
+That changes how you think about engine design. You are not just optimizing runtime behavior, you are also designing something that can be translated into a provable execution trace.
+
+---
+
+## Batch Model
+
+Stratos groups execution into **batches** or **epochs**.
+
+At a high level:
+
+1. the engine processes orders for an epoch,
+2. it computes the pre-state and post-state,
+3. it computes settlement deltas,
+4. it hands batch data to the prover,
+5. the resulting proof is later submitted on-chain.
+
+The important public values are:
+
+- `batch_id`,
+- `market_id`,
+- `initial_state`,
+- `final_state`,
+- `settlement_hash`.
+
+These values are not auxiliary metadata. They are the object the proof is bound to.
+
+If any of them change, the proof should no longer verify.
+
+---
+
+## State Representation
+
+The technical paper describes the state in terms of `StateFelts`, encoded as **34 M31 field elements**.
+
+That means the system does not prove against arbitrary Rust structs directly. It proves against a field-level representation of exchange state.
+
+At the contract boundary, this eventually gets encoded into a deterministic root-like commitment.
+
+Conceptually:
+
+```text
+pre-state  --> execute batch --> post-state
+    |                            |
+    +---- committed in proof ----+
+```
+
+This lets the chain track a compact canonical state instead of replaying a large order-book history on-chain.
+
+---
+
+## ZK Circuit Structure
+
+This is the part I find most technically interesting.
+
+Stratos does not use one monolithic "exchange circuit." The paper describes a **multi-component circuit** with dedicated components for specific operations.
+
+Some of the main circuit components are:
+
+- `ProcessorColumn`
+- `InsertionsColumn`
+- `MatchColumn`
+- `PartialMatchColumn`
+- `CancelsColumn`
+- `UpdatesColumn`
+- `PoseidonColumn`
+- `LessThanColumn`
+- `AddColumn`
+- `BytesPreProcessedColumn`
+
+This separation is important because the exchange has different classes of invariants:
+
+- book structure invariants,
+- arithmetic invariants,
+- ordering invariants,
+- state-hash invariants,
+- lookup consistency.
+
+Instead of proving everything in one opaque blob, the design turns the exchange into a set of constrained components that interact through lookup-style relations.
+
+That is much closer to how engineers actually reason about exchange logic.
+
+---
+
+## How Price-Time Priority Is Proven
+
+Price-time priority is one of the hardest properties to preserve correctly in a matching engine, and it is exactly the kind of thing that should not be left to "trust me."
+
+Stratos encodes this in two parts:
+
+### Price Priority
+
+The circuit uses comparison constraints via the `LessThanColumn`.
+
+Examples:
+
+- aggressive buy at price `P` can only match asks with `ask_price <= P`,
+- aggressive sell at price `P` can only match bids with `bid_price >= P`.
+
+In circuit terms, the system proves that the required inequality holds over the field representation, without allowing invalid underflow/borrow behavior to sneak through.
+
+### Time Priority
+
+Within a price level:
+
+- new orders are inserted at the tail,
+- matched orders are consumed from the head.
+
+So time priority is effectively expressed through queue discipline plus structural invariants on insertion and matching.
+
+This is a nice design choice because it avoids trying to prove "wall-clock time" directly. Instead, the circuit proves data-structure behavior that implies FIFO semantics.
+
+---
+
+## Partial Fills
+
+Partial fills are where simple descriptions of exchanges usually break down.
+
+For an aggressive order larger than the best resting order, the system must:
+
+- compute the fill size,
+- compute the quote amount,
+- update the resting order,
+- continue matching if residual quantity remains,
+- preserve accounting consistency.
+
+The paper describes dedicated `PartialMatchColumn` logic for this.
+
+The key math relation is:
+
+```text
+quote_amount = fill_size * price
+```
+
+In a normal engine, this is just arithmetic.
+
+In a circuit, you have to prove that the provided witness values satisfy the relation inside the field/arithmetic constraints. That is why Stratos has dedicated arithmetic components rather than assuming "the program probably multiplied correctly."
+
+---
+
+## Public Inputs and Proof Binding
+
+The paper defines a `StratosClaim` that includes:
+
+- initial state,
+- final state,
+- batch ID,
+- market ID,
+- settlement hash,
+- component claims and metadata.
+
+This matters because a proof is only useful if it is bound to exactly one batch transition.
+
+Informally, the system needs to prove:
+
+```text
+Given:
+  pre_root
+  post_root
+  batch_id
+  market_id
+  settlement_hash
+
+There exists a valid execution trace such that:
+  - matching rules were followed
+  - state transitions are valid
+  - settlement output is consistent
+```
+
+The technical paper notes that these values are mixed into the Fiat-Shamir channel, so the proof is tied to its public inputs cryptographically.
+
+That is why replay-protection checks in the contracts are so important too: the chain must enforce the same binding assumptions the proof system relies on.
+
+---
+
+## LogUp and Cross-Component Consistency
+
+Another detail I liked in the paper is the use of **LogUp** for cross-component lookups.
+
+Why is this needed?
+
+Because a processor-like component often needs to assert that another component validated some sub-operation:
+
+- a hash update,
+- an arithmetic step,
+- a comparison,
+- a state transition primitive.
+
+Instead of duplicating all that logic everywhere, the system uses lookup arguments. Components expose trace relations, and the interaction claim aggregates them into a global consistency condition.
+
+The paper summarizes this through a conservation-style condition on the global LogUp sum.
+
+That design is valuable because it lets the prover architecture stay modular without giving up soundness.
+
+---
+
+## Why STARK First, Then SP1 Groth16
+
+This is one of the most practical parts of the design.
+
+Native STARK proofs are attractive because they are transparent and avoid a trusted setup, but they are too large and expensive for direct EVM verification.
+
+So Stratos uses a two-step proving pipeline:
+
+### Step 1. Generate the STARK Proof
+
+The STARK proves that the batch execution trace is valid.
+
+This captures the actual exchange logic.
+
+### Step 2. Wrap Verification in SP1
+
+SP1 runs the STARK verifier inside a zkVM and emits a compact Groth16 proof.
+
+That Groth16 proof is what the EVM verifies.
+
+So the chain is not verifying the full exchange computation directly. It is verifying:
+
+```text
+"the STARK verifier accepted a proof for these public values"
+```
+
+That is a very practical architecture because it preserves rich proving logic off-chain while keeping the on-chain verifier small enough to be usable.
+
+---
+
+## Public Values Layout
+
+The proof submission path includes a `public_values` blob that encodes:
+
+- batch ID,
+- market ID,
+- settlement hash,
+- initial state,
+- final state,
+- verification marker.
+
+This contract-level decoding is not just plumbing. It is part of the security model.
+
+The verifier contract must decode and check the same values the proof commits to. Otherwise you end up with dangerous mismatches between:
+
+- what the prover proved,
+- what the contracts think was proved.
+
+That exact class of mismatch is what caused one of the replay-related issues described in the paper.
+
+---
+
+## Data Availability and Celestia
+
+Proof validity alone is not enough for a good exchange architecture.
+
+Users also need access to the batch data required to reconstruct state and inspect what happened.
+
+Posting everything to EVM calldata would be expensive, so Stratos uses Celestia as a DA layer for compressed batch data.
+
+This is a good split:
+
+- Horizen Testnet handles verification and settlement,
+- Celestia handles higher-throughput data publication.
+
+Conceptually:
+
+```text
+engine output
+  -> compressed batch data -> Celestia
+  -> proof + public values  -> Horizen Testnet
+```
+
+That decouples the two costs that usually get tangled together in rollup-like systems:
+
+- proving/verification cost,
+- data publication cost.
+
+---
+
+## On-Chain Contract Architecture
+
+The smart contract layer is broken into specialized contracts:
+
+- `StratosConfig`
+- `StratosState`
+- `StratosVerifier`
+- `StratosBridge`
+- `StratosSettlement`
+- `StratosUserRegistry`
+- `StateEncoder`
+
+I like this separation because each contract owns a narrow responsibility.
+
+### `StratosState`
+
+Tracks submitted batches and canonical state roots.
+
+Main job:
+
+- ensure sequential batch progression,
+- store pending/finalized batch info,
+- coordinate proof-backed state updates.
+
+### `StratosVerifier`
+
+Handles proof verification and public-value decoding.
+
+Main job:
+
+- call the SP1 verification gateway,
+- decode batch-level fields from `public_values`,
+- bind decoded fields to the submitted batch.
+
+### `StratosSettlement`
+
+Applies settlement deltas.
+
+Main job:
+
+- recompute settlement hash from delta data,
+- ensure it matches the hash committed in the proof,
+- update user balances accordingly.
+
+### `StratosBridge`
+
+Handles custody and withdrawal.
+
+Main job:
+
+- accept deposits,
+- let users withdraw finalized balances,
+- support emergency exit after timeout.
+
+This is the contract that matters most from a user-funds perspective.
+
+---
+
+## Deposit and Withdrawal Flow
+
+The deposit side is interesting because deposits themselves are on-chain, but the trading state is off-chain until included in batches.
+
+The flow is roughly:
+
+1. user deposits USDC into the bridge contract,
+2. contract emits deposit event,
+3. off-chain engine/indexer observes confirmed deposit,
+4. engine credits the user's trading balance,
+5. later trades affect the user's settlement outcome,
+6. after batch finalization + settlement application, user can withdraw.
+
+So the bridge contract is the hard custody layer, while the engine is the active trading layer.
+
+This split is also why emergency exit matters. If the operator disappears or censors users, there still needs to be a credible way to recover deposited funds.
+
+---
+
+## Security Issues and Fixes
+
+The technical paper includes several concrete vulnerabilities. That is one of the most useful parts of it.
+
+### V-001: Proof Replay / Batch ID Mismatch
+
+The issue was that the verifier decoded a `batchId` from the proof's public values but did not originally enforce that it matched the batch ID supplied to the contract call.
+
+That is dangerous because the whole proof system assumes public-input binding.
+
+Fix:
+
+```solidity
+require(spBatchId == batchId, "StratosVerifier: batch ID mismatch");
+```
+
+This closes the gap between:
+
+- what the proof is actually for,
+- what the contract call claims it is for.
+
+### V-002: Double Withdrawal via Deposit Accounting
+
+The paper describes a bug where deposit-tracking state was not decremented properly on withdrawal paths.
+
+That creates a classic accounting bug:
+
+- withdraw through the normal path,
+- later still appear eligible for emergency withdrawal.
+
+Fix:
+
+- decrement tracked deposit state on every withdrawal path.
+
+This is the kind of issue that has nothing to do with fancy ZK design and everything to do with exchange correctness. It is a good reminder that proving the batch is only part of building a safe system.
+
+### V-003: O(n^2) Settlement Hash Construction
+
+Settlement hashing originally suffered from inefficient repeated memory concatenation in Solidity.
+
+That turns into a DoS risk when batch settlement grows.
+
+Fix:
+
+- pre-allocate buffer memory,
+- compute the hash in linear rather than quadratic-style memory behavior.
+
+This is a good example of "the protocol is correct, but the implementation can still fail at scale."
+
+### Other Issues
+
+The paper also discusses:
+
+- padding trade boundary problems,
+- unconstrained opcode issues,
+- component gating inconsistencies.
+
+These are exactly the kinds of bugs you expect in prover-heavy systems where:
+
+- execution semantics,
+- trace translation,
+- and circuit constraints
+
+all need to align perfectly.
+
+---
+
+## Performance Notes
+
+The reported benchmark profile is what I would expect from this architecture:
+
+- extremely fast matching,
+- much slower proof generation,
+- compact on-chain verification,
+- cheap-ish settlement on an L2.
+
+The engine benchmarks in the paper are strong, with very high throughput for placement/matching under benchmark assumptions.
+
+The proving path is slower:
+
+- small batches: seconds,
+- medium batches: tens of seconds to minutes,
+- larger batches: minutes.
+
+That creates the usual split between:
+
+- **soft finality**: engine accepted and matched your order,
+- **hard finality**: proof is wrapped, verified, and finalized on-chain.
+
+This is acceptable if the product is positioned correctly. Stratos is not trying to make proof generation disappear. It is using proofs to backstop a fast matching layer.
+
+---
+
+## What I Think Is Most Interesting Technically
+
+Three things stand out.
+
+### 1. The exchange logic is being treated as a proving problem
+
+A lot of ZK systems prove generic state transitions. Stratos is more specific: it tries to prove actual exchange microstructure rules.
+
+That is harder and more interesting.
+
+### 2. The architecture is intentionally decomposed
+
+Engine, prover, wrapper, contracts, DA layer, frontend: each piece is doing one job.
+
+That makes the system complex, but in the right way. The complexity is explicit instead of hidden.
+
+### 3. The security model is practical
+
+The system does not rely on "ZK solves everything."
+
+It still cares about:
+
+- replay protection,
+- accounting correctness,
+- settlement gas costs,
+- emergency exit,
+- DA assumptions,
+- operator behavior.
+
+That is a healthier design mindset than treating the proof as magic.
+
+---
+
+## Open Ends / Future Work
+
+The paper also makes clear that Stratos is not "done."
+
+Important future directions include:
+
+- stronger in-circuit state chaining,
+- per-user Merkle claims for settlement,
+- decentralized sequencing,
+- multi-market support,
+- prover hardware acceleration,
+- eventually removing the Groth16 wrapper if native on-chain Circle STARK verification becomes practical.
+
+Each of these would move Stratos closer to a stronger trust-minimized exchange architecture.
+
+---
+
+## Closing
+
+If I compress the whole system into one sentence:
+
+> Stratos is an attempt to make a high-performance order book auditable and enforceable through cryptographic proofs instead of operator trust.
+
+That is why I think it is a meaningful project.
+
+It is not just a frontend, not just a smart contract suite, and not just a prover experiment. It is the integration of all three:
+
+- exchange engine,
+- proving system,
+- settlement infrastructure.
+
+And that integration is where most of the hard engineering lives.
